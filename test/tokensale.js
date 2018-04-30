@@ -72,6 +72,7 @@ contract('TokenSale', function(accounts){
 			return tokenInstance.balanceOf(admin);
 		}).then(function(balance){
 			//assert.equal(balance.toNumber(),999990,'returns all token to admin');
+			//assert.equal(balance.toNumber(),999990,'returns all token to admin');
 		});
 	});
 });
