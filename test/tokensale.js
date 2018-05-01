@@ -20,7 +20,7 @@ contract('TokenSale', function(accounts){
 			assert.notEqual(address, '0x0', 'Address');
 			return tokensaleInstance.tokenPrice();
 		}).then(function(tokenPrice){
-			assert.equal(tokenPrice,100000000, 'Equal');
+			assert.equal(tokenPrice.toNumber(),tokenPrice, 'Equal');
 		});
 	});
 
@@ -32,6 +32,9 @@ contract('TokenSale', function(accounts){
 			tokensaleInstance = instance;
 			return tokenInstance.transfer(tokensaleInstance.address, tokenAvailable, {from: admin });
 		}).then(function(receipt){
+			return tokenInstance.balanceOf(tokensaleInstance.address);
+		}).then(function(balance){
+			assert.equal(balance.toNumber(),tokenAvailable,'Token sale contact get the tokens to sell');
 			numberOfTokens = 10;
 			return tokensaleInstance.buyTokens( numberOfTokens, { from: buyer, value: numberOfTokens*tokenPrice });
 		}).then(function(receipt){
@@ -47,7 +50,7 @@ contract('TokenSale', function(accounts){
 			assert.equal(balance.toNumber(),numberOfTokens,'Buyer has 10 token');
 			return tokenInstance.balanceOf(tokensaleInstance.address);
 		}).then(function(balance){
-			assert.equal(balance.toNumber(),tokenAvailable);
+			assert.equal(balance.toNumber(),tokenAvailable-numberOfTokens);
 			// Try to buy tokens with different eather value
 			return tokensaleInstance.buyTokens( numberOfTokens, {from:buyer, value: 1 });
 		}).then(assert.fail).catch(function(error){
@@ -57,7 +60,7 @@ contract('TokenSale', function(accounts){
 			assert(error.message.indexOf('revert')>=0,'Can not purchase more than available token');
 		});
 	});
-
+	
 	it('Ends token sale',function(){
 		return DappToken.deployed().then(function(instance){
 			tokenInstance= instance;
@@ -71,8 +74,12 @@ contract('TokenSale', function(accounts){
 		}).then(function(receipt){
 			return tokenInstance.balanceOf(admin);
 		}).then(function(balance){
-			//assert.equal(balance.toNumber(),999990,'returns all token to admin');
-			//assert.equal(balance.toNumber(),999990,'returns all token to admin');
+			assert.equal(balance.toNumber(), 999990,'returns all token to admin');
+			// Check that token price was reset when selfDestruct was called
+			return tokensaleInstance.tokenPrice();
+		}).then(function(price){
+			assert.equal(price.toNumber(), 0, 'token price was reset');
 		});
 	});
+	
 });

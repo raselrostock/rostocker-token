@@ -27,8 +27,10 @@ contract Tokensale{
 		// Require only admin
 		require( msg.sender == admin );
 		// Transfer remaining tokens to admin
-		require( tokenContract.transfer(admin,tokenContract.balanceOf(this)));
+		require( tokenContract.transfer(admin, tokenContract.balanceOf(this)));
 		// Destroy the contract
+		
+		selfdestruct(admin);
 	}
 	
 }
