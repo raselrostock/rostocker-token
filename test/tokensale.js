@@ -79,6 +79,8 @@ contract('TokenSale', function(accounts){
 			return tokensaleInstance.tokenPrice();
 		}).then(function(price){
 			assert.equal(price.toNumber(), 0, 'token price was reset');
+			// Check that token price was reset when selfDestruct was called
+
 		});
 	});
 	
